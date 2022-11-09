@@ -15,8 +15,8 @@ class _HomePageState extends State<HomePage> {
   int selectedPage = 0;
 
   final _pageOptions = [
-    Calculator(),
-    Convertor(),
+    const Calculator(),
+    const Convertor(),
   ];
 
   @override
@@ -53,116 +53,141 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Calculator extends StatefulWidget {
+  const Calculator({super.key});
+
   @override
   CalculatorState createState() => CalculatorState();
 }
-class CalculatorState extends State<Calculator>{
+
+class CalculatorState extends State<Calculator> {
   String input = '0';
 
-  void updateInput(String val) {
-    setState(() {
-      if(val == 'percentage'){
-        // get result then divide by 100
-      }else if(val == 'parentheses'){
+  // Change this factor to change the size of digits on screen
+  double inputScaleFactor = 1;
 
-      }else if(val == 'negative'){
-
-      }else if(val == 'dot'){
-
-      }else{
-        if(input == '0') {
-          input = val;
-        }else {
-          input = input + val;
-        }
-      }
-    });
-  }
-  void clearInput() {
-    setState(() {
-      input = '0';
-    });
-  }
-  void backspaceInput() {
-    setState(() {
-      if(input.length>1){
-        input = input.substring(0, input.length-1);
-      }
-      else{
-        input = '0';
-      }
-    });
-  }
-  void getResult() {
-    setState(() {
-      input = "Result";
-    });
-  }
   @override
   Widget build(BuildContext context) {
-
-
-
     return Container(
       color: Colors.lightBlue[100],
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(input, style: const TextStyle(fontSize: 50, color: Colors.black),textAlign: TextAlign.right,),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            reverse: true,
+            child: SelectableText(
+              input,
+              style: const TextStyle(fontSize: 70, color: Colors.black,),
+              textScaleFactor: inputScaleFactor,
+            ),
+          ),
           Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              ElevatedButton(
+                onPressed: backspaceInput,
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.grey[500],
+                    shape: const CircleBorder(),
+                    minimumSize: Size(0.243*MediaQuery.of(context).size.width, 0.12*MediaQuery.of(context).size.height)),
+                child: const Icon(Icons.backspace_outlined),
+              ),
               Row(
                 children: [
-                  ElevatedButton(onPressed: backspaceInput, child: const Icon(Icons.backspace_outlined)),
+                  buildButton(buildButtonText("C", Colors.red[400]), clearInput, Colors.white),
+                  buildButton(buildButtonText("()", Colors.green[500]), () => updateInput("parenthesis"), Colors.white),
+                  buildButton(buildButtonText("%", Colors.green[500]), () => updateInput("percentage"), Colors.white),
+                  buildButton(buildButtonText("\u00F7", Colors.green[500]), () => updateInput("division"), Colors.white),
                 ],
               ),
               Row(
                 children: [
-                  ElevatedButton(onPressed: clearInput, child: const Text("C")),
-                  ElevatedButton(onPressed: () => updateInput("parentheses"), child: const Text("()")),
-                  ElevatedButton(onPressed: () => updateInput("percentage"), child: const Text("%")),
-                  ElevatedButton(onPressed: () => updateInput("/"), child: const Text("\u00F7")),
+                  buildButton(buildButtonText("7", Colors.black87), () => updateInput("7"), Colors.white),
+                  buildButton(buildButtonText("8", Colors.black87), () => updateInput("8"), Colors.white),
+                  buildButton(buildButtonText("9", Colors.black87), () => updateInput("9"), Colors.white),
+                  buildButton(buildButtonText("\u00D7", Colors.green[500]), () => updateInput("multiplication"), Colors.white),
                 ],
               ),
               Row(
                 children: [
-                  ElevatedButton(onPressed: () => updateInput("7"), child: const Text("7")),
-                  ElevatedButton(onPressed: () => updateInput("8"), child: const Text("8")),
-                  ElevatedButton(onPressed: () => updateInput("9"), child: const Text("9")),
-                  ElevatedButton(onPressed: () => updateInput("*"), child: const Text("X")),
+                  buildButton(buildButtonText("4", Colors.black87), () => updateInput("4"), Colors.white),
+                  buildButton(buildButtonText("5", Colors.black87), () => updateInput("5"), Colors.white),
+                  buildButton(buildButtonText("6", Colors.black87), () => updateInput("6"), Colors.white),
+                  buildButton(buildButtonText("-", Colors.green[500]), () => updateInput("subtraction"), Colors.white),
                 ],
               ),
               Row(
                 children: [
-                  ElevatedButton(onPressed: () => updateInput("4"), child: const Text("4")),
-                  ElevatedButton(onPressed: () => updateInput("5"), child: const Text("5")),
-                  ElevatedButton(onPressed: () => updateInput("6"), child: const Text("6")),
-                  ElevatedButton(onPressed: () => updateInput("-"), child: const Text("-")),
+                  buildButton(buildButtonText("1", Colors.black87), () => updateInput("1"), Colors.white),
+                  buildButton(buildButtonText("2", Colors.black87), () => updateInput("2"), Colors.white),
+                  buildButton(buildButtonText("3", Colors.black87), () => updateInput("3"), Colors.white),
+                  buildButton(buildButtonText("+", Colors.green[500]), () => updateInput("addition"), Colors.white),
                 ],
               ),
-              Row(
-                children: [
-                  ElevatedButton(onPressed: () => updateInput("1"), child: const Text("1")),
-                  ElevatedButton(onPressed: () => updateInput("2"), child: const Text("2")),
-                  ElevatedButton(onPressed: () => updateInput("3"), child: const Text("3")),
-                  ElevatedButton(onPressed: () => updateInput("+"), child: const Text("+")),
-                ],
-              ),
-              Row(
-                children: [
-                  ElevatedButton(onPressed: () => updateInput("negative"), child: const Text("+/-")),
-                  ElevatedButton(onPressed: () => updateInput("0"), child: const Text("0")),
-                  ElevatedButton(onPressed: () => updateInput("dot"), child: const Text(".")),
-                  ElevatedButton(onPressed: getResult, child: const Text("=")),
-                ],
-              ),
+                Row(
+                  children: [
+                    buildButton(buildButtonText("+/-", Colors.black87), () => updateInput("negate"), Colors.white),
+                    buildButton(buildButtonText("0", Colors.black87), () => updateInput("0"), Colors.white),
+                    buildButton(buildButtonText(".", Colors.black87), () => updateInput("decimal"), Colors.white),
+                    buildButton(buildButtonText("=", Colors.white), getResult, Colors.green[500]),
+                  ],
+                ),
             ],
           ),
         ],
       ),
     );
   }
-}
 
+  Expanded buildButton(Widget widget, void Function() onPressedInput, Color? backgroundColor) {
+    return Expanded(
+      flex: 4,
+      child: ElevatedButton(
+        onPressed: onPressedInput,
+        style: ElevatedButton.styleFrom(
+            backgroundColor: backgroundColor,
+            shape: const CircleBorder(),
+            minimumSize: Size(0.243*MediaQuery.of(context).size.width, 0.12*MediaQuery.of(context).size.height)),
+        child: widget,
+      ),
+    );
+  }
+  Text buildButtonText(String text, Color? textColor){
+    return Text(text,
+        style: TextStyle(fontSize: 30, color: textColor),);
+  }
+
+  void updateInput(String val) {
+    setState(() {
+      input+=val;
+      // TODO : add logic to update input
+      // TODO : manage the input as you would like
+    });
+  }
+
+  void clearInput() {
+    setState(() {
+      // TODO: Add clear input
+    });
+  }
+
+  void backspaceInput() {
+    setState(() {
+      // TODO: Add backspace functionality
+    });
+  }
+
+  void getResult() {
+    setState(() {
+      // TODO : Add logic to get result
+      // TODO : Use a library to evaluate the expression or write your own algorithm. I suggest using the first option.
+    });
+  }
+
+}
 
 class Convertor extends StatelessWidget {
   const Convertor({super.key});
