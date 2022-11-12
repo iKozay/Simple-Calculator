@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Calculator.dart';
+import 'Convertor.dart';
 
 void main() => runApp(const HomePage());
 
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedPage = 0;
+  int selectedPage = 1;
 
   final _pageOptions = [
     const Calculator(),
@@ -24,7 +25,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.white,
         body: _pageOptions[selectedPage],
         bottomNavigationBar: BottomNavigationBar(
           items: const [
@@ -53,16 +53,3 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class Convertor extends StatelessWidget {
-  const Convertor({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: put your code here for the implementation of the Convertor
-    return Container(
-      // I have add the next color just to visualize that the container changes when changing the buttons
-      // We will certainly change it later.
-      color: Colors.lightGreenAccent[100],
-    );
-  }
-}
