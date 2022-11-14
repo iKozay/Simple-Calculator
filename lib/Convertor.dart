@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dropdown_button2/custom_dropdown_button2.dart';
+import './interface_components/DropDown2.dart';
 
 class Convertor extends StatefulWidget {
   const Convertor({super.key});
@@ -9,7 +9,6 @@ class Convertor extends StatefulWidget {
 }
 
 class _ConvertorState extends State<Convertor> {
-
   /*
    * The following variable will hold the value of the
    * converted measurement: ex if user input 1 m, and final unit is
@@ -29,7 +28,45 @@ class _ConvertorState extends State<Convertor> {
     ['cm', 'm', 'inch', 'feet', 'miles', 'm'],
   ];
 
-  void onTextFieldChange(num) {
+  /// this method is called whenever the type of unit conversion is changed using the top drop down menu
+  /// this method has is supposed to reset the values in the textFields as well as in the units drop downs.
+  void onTypesDropDownChange(value) {
+    setState(() {
+      dropDownInitialValue = value!;
+    });
+    unitInitial1 = units[types.indexOf(dropDownInitialValue)][0];
+    unitInitial2 = units[types.indexOf(dropDownInitialValue)][0];
+  }
+
+  /// this method is called when the first units' drop down has element changed.
+  /// the unit appearing in the resultant textField is supposed to change when the user change the value of this dropDown
+  void onUnits1Change(value) {
+    setState(() {
+      unitInitial1 = value!;
+    });
+  }
+
+  /// this method is called when the second units' drop down has element changed.
+  /// the unit appearing in the resultant textField is supposed to change when the user change the value of this dropDown
+  void onUnits2Change(value) {
+    setState(() {
+      unitInitial2 = value!;
+    });
+  }
+
+  /// this method is called whenever the user change the elements in the first textField.
+  /// it is supposed to calculate the the resultant value in the desired unit depending on the user input.
+  /// it will use its value, and the values of the units drop downs to accomplish this task
+  void onTextField1Change(double number) {
+    print('You wrote this: $number');
+    setState(() {
+
+    });
+  }
+
+  /// this method is called whenever the switch green button is pressed.
+  /// it is supposed to switch the values between the 2 textFields as well as the unites in drop down menus
+  void switchButtonPressed() {
     setState(() {
 
     });
@@ -40,7 +77,7 @@ class _ConvertorState extends State<Convertor> {
     // TODO: put your code here for the implementation of the Unit Convertor
 
     return Container(
-      padding: const EdgeInsets.all(35),
+      padding: const EdgeInsets.all(30),
       decoration: const BoxDecoration(
         color: Color(0xFFEFFFDA),
       ),
@@ -51,7 +88,7 @@ class _ConvertorState extends State<Convertor> {
           // Page Title
           Container(
             width: double.infinity,
-            margin: const EdgeInsets.only(bottom: 40),
+            margin: const EdgeInsets.only(bottom: 30),
             child: const Text(
               'Unit Convertor',
               textAlign: TextAlign.start,
@@ -60,48 +97,14 @@ class _ConvertorState extends State<Convertor> {
           ),
           // drop down to determine the type of unit conversion (temperature, measurement)
           Center(
-            child: CustomDropdownButton2(
-              buttonWidth: 200,
-              buttonHeight: 55,
-              dropdownWidth: 200,
-              hint: 'Select Item',
-              dropdownItems: types,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 25,
+            child: DropDown2(
+              width: 200,
               value: dropDownInitialValue,
-              onChanged: (value) {
-                setState(() {
-                  dropDownInitialValue = value!;
-                });
-                unitInitial1 = units[types.indexOf(dropDownInitialValue)][0];
-                unitInitial2 = units[types.indexOf(dropDownInitialValue)][0];
+              dropdownItems: types,
+              backgroundColor: Colors.white,
+              onChangeHandler: (value) {
+                onTypesDropDownChange(value);
               },
-              buttonPadding: const EdgeInsets.only(left: 20, right: 10),
-              buttonDecoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: const Offset(1, 3) // changes position of shadow
-                      ),
-                ],
-                borderRadius: BorderRadius.circular(40),
-                color: Colors.white,
-              ),
-              dropdownElevation: 8,
-              scrollbarRadius: const Radius.circular(40),
-              dropdownDecoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3) // changes position of shadow
-                      ),
-                ],
-                borderRadius: BorderRadius.circular(14),
-              ),
             ),
           ),
           // informative text
@@ -128,8 +131,8 @@ class _ConvertorState extends State<Convertor> {
                     padding: const EdgeInsets.only(right: 15.0),
                     child: TextField(
                       keyboardType: TextInputType.number,
-                      onChanged: (num) {
-                        onTextFieldChange(num);
+                      onChanged: (number) {
+                        onTextField1Change(double.parse(number));
                       },
                       decoration: InputDecoration(
                         filled: true,
@@ -162,48 +165,15 @@ class _ConvertorState extends State<Convertor> {
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Center(
-                      child: CustomDropdownButton2(
-                        buttonHeight: 60,
-                        hint: 'Select Item',
-                        value: unitInitial1,
+                      child: DropDown2(
+                        width: 132.3,
+                        backgroundColor: Colors.grey[300],
                         dropdownItems:
                             units[types.indexOf(dropDownInitialValue)],
-                        icon: const Icon(Icons.arrow_drop_down),
-                        iconSize: 25,
-                        onChanged: (value) {
-                          setState(() {
-                            unitInitial1 = value!;
-                          });
+                        value: unitInitial1,
+                        onChangeHandler: (value) {
+                          onUnits1Change(value);
                         },
-                        buttonPadding:
-                            const EdgeInsets.only(left: 20, right: 10),
-                        buttonDecoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 4,
-                              offset: const Offset(
-                                  1, 3), // changes position of shadow
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(40),
-                          color: Colors.grey[300],
-                        ),
-                        dropdownElevation: 8,
-                        scrollbarRadius: const Radius.circular(40),
-                        dropdownDecoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(
-                                  0, 3), // changes position of shadow
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
                       ),
                     ),
                   ),
@@ -224,7 +194,7 @@ class _ConvertorState extends State<Convertor> {
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: switchButtonPressed,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFA7D486),
                       shape: const CircleBorder(),
@@ -285,48 +255,15 @@ class _ConvertorState extends State<Convertor> {
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Center(
-                      child: CustomDropdownButton2(
-                        buttonHeight: 60,
-                        hint: 'Select Item',
-                        value: unitInitial2,
+                      child: DropDown2(
+                        width: 132.3,
+                        backgroundColor: Colors.grey[300],
                         dropdownItems:
                             units[types.indexOf(dropDownInitialValue)],
-                        icon: const Icon(Icons.arrow_drop_down),
-                        iconSize: 25,
-                        onChanged: (value) {
-                          setState(() {
-                            unitInitial2 = value!;
-                          });
+                        value: unitInitial2,
+                        onChangeHandler: (value) {
+                          onUnits2Change(value);
                         },
-                        buttonPadding:
-                            const EdgeInsets.only(left: 20, right: 10),
-                        buttonDecoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 2,
-                                blurRadius: 4,
-                                offset: const Offset(
-                                    1, 3) // changes position of shadow
-                                ),
-                          ],
-                          borderRadius: BorderRadius.circular(40),
-                          color: Colors.grey[300],
-                        ),
-                        dropdownElevation: 8,
-                        scrollbarRadius: const Radius.circular(40),
-                        dropdownDecoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(
-                                    0, 3) // changes position of shadow
-                                ),
-                          ],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
                       ),
                     ),
                   ),
