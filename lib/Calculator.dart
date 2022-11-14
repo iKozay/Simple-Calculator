@@ -10,107 +10,211 @@ class Calculator extends StatefulWidget {
 class CalculatorState extends State<Calculator> {
   String input = '0';
 
-  // Change this factor to change the size of digits on screen
-  double inputScaleFactor = 1;
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.lightBlue[100],
+      color: Colors.grey[50],
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             reverse: true,
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
             child: SelectableText(
               input,
-              style: const TextStyle(fontSize: 70, color: Colors.black,),
-              textScaleFactor: inputScaleFactor,
+              style: TextStyle(
+                fontSize: 50,
+                color: Colors.grey[900],
+                fontWeight: FontWeight.w300,
+              ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              ElevatedButton(
-                onPressed: backspaceInput,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.grey[500],
-                    shape: const CircleBorder(),
-                    minimumSize: Size(0.243*MediaQuery.of(context).size.width, 0.12*MediaQuery.of(context).size.height)),
-                child: const Icon(Icons.backspace_outlined),
-              ),
-              Row(
-                children: [
-                  buildButton(buildButtonText("C", Colors.red[400]), clearInput, Colors.white),
-                  buildButton(buildButtonText("()", Colors.green[500]), () => updateInput("parenthesis"), Colors.white),
-                  buildButton(buildButtonText("%", Colors.green[500]), () => updateInput("percentage"), Colors.white),
-                  buildButton(buildButtonText("\u00F7", Colors.green[500]), () => updateInput("division"), Colors.white),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton(buildButtonText("7", Colors.black87), () => updateInput("7"), Colors.white),
-                  buildButton(buildButtonText("8", Colors.black87), () => updateInput("8"), Colors.white),
-                  buildButton(buildButtonText("9", Colors.black87), () => updateInput("9"), Colors.white),
-                  buildButton(buildButtonText("\u00D7", Colors.green[500]), () => updateInput("multiplication"), Colors.white),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton(buildButtonText("4", Colors.black87), () => updateInput("4"), Colors.white),
-                  buildButton(buildButtonText("5", Colors.black87), () => updateInput("5"), Colors.white),
-                  buildButton(buildButtonText("6", Colors.black87), () => updateInput("6"), Colors.white),
-                  buildButton(buildButtonText("-", Colors.green[500]), () => updateInput("subtraction"), Colors.white),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton(buildButtonText("1", Colors.black87), () => updateInput("1"), Colors.white),
-                  buildButton(buildButtonText("2", Colors.black87), () => updateInput("2"), Colors.white),
-                  buildButton(buildButtonText("3", Colors.black87), () => updateInput("3"), Colors.white),
-                  buildButton(buildButtonText("+", Colors.green[500]), () => updateInput("addition"), Colors.white),
-                ],
-              ),
-              Row(
-                children: [
-                  buildButton(buildButtonText("+/-", Colors.black87), () => updateInput("negate"), Colors.white),
-                  buildButton(buildButtonText("0", Colors.black87), () => updateInput("0"), Colors.white),
-                  buildButton(buildButtonText(".", Colors.black87), () => updateInput("decimal"), Colors.white),
-                  buildButton(buildButtonText("=", Colors.white), getResult, Colors.green[500]),
-                ],
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      const Spacer(),
+                      const Spacer(),
+                      Expanded(
+                        flex: 1,
+                        child: ElevatedButton(
+                          onPressed: backspaceInput,
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: Colors.grey[100],
+                            shape: const CircleBorder(),
+                            minimumSize: Size(
+                                0.2 * MediaQuery.of(context).size.width,
+                                0.1 * MediaQuery.of(context).size.height),
+                            //padding: const EdgeInsets.all(40),
+                            //alignment: Alignment.centerRight,
+                          ),
+                          child: const Icon(
+                            color: Color(0xFF7CB342),
+                            Icons.backspace_outlined,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "C", textColor: Colors.red[400]),
+                        onPressedInput: clearInput),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "( )", textColor: Colors.lightGreen[600]),
+                        onPressedInput: () => updateInput("parenthesis")),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "%", textColor: Colors.lightGreen[600]),
+                        onPressedInput: () => updateInput("percentage")),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "\u00F7",
+                            textColor: Colors.lightGreen[600],
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300),
+                        onPressedInput: () => updateInput("division")),
+                  ],
+                ),
+                Row(
+                  children: [
+                    buildButton(
+                        widget: buildButtonText(text: "7"),
+                        onPressedInput: () => updateInput("7")),
+                    buildButton(
+                        widget: buildButtonText(text: "8"),
+                        onPressedInput: () => updateInput("8")),
+                    buildButton(
+                        widget: buildButtonText(text: "9"),
+                        onPressedInput: () => updateInput("9")),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "\u00D7",
+                            textColor: Colors.lightGreen[600],
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300),
+                        onPressedInput: () => updateInput("multiplication")),
+                  ],
+                ),
+                Row(
+                  children: [
+                    buildButton(
+                        widget: buildButtonText(text: "4"),
+                        onPressedInput: () => updateInput("4")),
+                    buildButton(
+                        widget: buildButtonText(text: "5"),
+                        onPressedInput: () => updateInput("5")),
+                    buildButton(
+                        widget: buildButtonText(text: "6"),
+                        onPressedInput: () => updateInput("6")),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "\u2212",
+                            textColor: Colors.lightGreen[600],
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300),
+                        onPressedInput: () => updateInput("subtraction")),
+                  ],
+                ),
+                Row(
+                  children: [
+                    buildButton(
+                        widget: buildButtonText(text: "1"),
+                        onPressedInput: () => updateInput("1")),
+                    buildButton(
+                        widget: buildButtonText(text: "2"),
+                        onPressedInput: () => updateInput("2")),
+                    buildButton(
+                        widget: buildButtonText(text: "3"),
+                        onPressedInput: () => updateInput("3")),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "\u002b",
+                            textColor: Colors.lightGreen[600],
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300),
+                        onPressedInput: () => updateInput("addition")),
+                  ],
+                ),
+                Row(
+                  children: [
+                    buildButton(
+                        widget: buildButtonText(text: "+/-"),
+                        onPressedInput: () => updateInput("negate")),
+                    buildButton(
+                        widget: buildButtonText(text: "0"),
+                        onPressedInput: () => updateInput("0")),
+                    buildButton(
+                        widget: buildButtonText(text: "."),
+                        onPressedInput: () => updateInput("decimal")),
+                    buildButton(
+                        widget: buildButtonText(
+                            text: "\u003d",
+                            textColor: Colors.white,
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300),
+                        onPressedInput: getResult,
+                        backgroundColor: Colors.lightGreen[600]),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Expanded buildButton(Widget widget, void Function() onPressedInput, Color? backgroundColor) {
+  Expanded buildButton(
+      {required Widget widget,
+      required void Function() onPressedInput,
+      Color? backgroundColor = const Color(0xFFF5F5F5)}) {
     return Expanded(
       flex: 4,
-      child: ElevatedButton(
-        onPressed: onPressedInput,
-        style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor,
-            shape: const CircleBorder(),
-            minimumSize: Size(0.243*MediaQuery.of(context).size.width, 0.12*MediaQuery.of(context).size.height)),
-        child: widget,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: ElevatedButton(
+          onPressed: onPressedInput,
+          style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: backgroundColor,
+              shape: const CircleBorder(),
+              minimumSize: Size(0.2 * MediaQuery.of(context).size.width,
+                  0.1 * MediaQuery.of(context).size.height)),
+          child: widget,
+        ),
       ),
     );
   }
-  Text buildButtonText(String text, Color? textColor){
-    return Text(text,
-      style: TextStyle(fontSize: 30, color: textColor),);
+
+  Text buildButtonText(
+      {required String text,
+      Color? textColor = const Color(0xFF616161),
+      double? fontSize = 30,
+      FontWeight? fontWeight = FontWeight.w400}) {
+    return Text(
+      text,
+      style: TextStyle(
+          fontSize: fontSize, color: textColor, fontWeight: fontWeight),
+    );
   }
 
   void updateInput(String val) {
     setState(() {
-      input+=val;
+      input += val;
       // TODO : add logic to update input
       // TODO : manage the input as you would like
     });
@@ -118,6 +222,7 @@ class CalculatorState extends State<Calculator> {
 
   void clearInput() {
     setState(() {
+      input = '0';
       // TODO: Add clear input
     });
   }
@@ -134,5 +239,4 @@ class CalculatorState extends State<Calculator> {
       // TODO : Use a library to evaluate the expression or write your own algorithm. I suggest using the first option.
     });
   }
-
 }

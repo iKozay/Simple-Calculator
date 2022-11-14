@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedPage = 1;
+  int selectedPage = 0;
 
   final _pageOptions = [
     const Calculator(),
