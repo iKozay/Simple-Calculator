@@ -14,19 +14,25 @@ class _ConvertorState extends State<Convertor> {
    * converted measurement: ex if user input 1 m, and final unit is
    * cm, then this variable will hold 100
    */
-  double finalValue = 0.0;
+
 
   // initial units displayed to the user
-  String unitInitial1 = 'Celsius';
-  String unitInitial2 = 'Celsius';
+  String unit1 = 'Celsius';
+  String unit2 = 'Celsius';
+  double value1 = 0.0;
+  double finalValue = 0.0;
+  bool invalidInput = false;
   String dropDownInitialValue = 'Temperature';
   // unit convertor types
   var types = ['Temperature', 'Measurement'];
   // list of unites
   var units = [
-    ['Celsius', 'kelvin', 'Fahrenheit'],
-    ['cm', 'm', 'inch', 'feet', 'miles', 'm'],
+    ['Celsius', 'Kelvin', 'Fahrenheit'],
+    ['cm', 'm', 'inch', 'feet', 'miles'],
   ];
+
+  var fieldText1Controller = TextEditingController();
+  var fieldText2Controller = TextEditingController();
 
   /// this method is called whenever the type of unit conversion is changed using the top drop down menu
   /// this method has is supposed to reset the values in the textFields as well as in the units drop downs.
@@ -34,41 +40,130 @@ class _ConvertorState extends State<Convertor> {
     setState(() {
       dropDownInitialValue = value!;
     });
-    unitInitial1 = units[types.indexOf(dropDownInitialValue)][0];
-    unitInitial2 = units[types.indexOf(dropDownInitialValue)][0];
+    unit1 = units[types.indexOf(dropDownInitialValue)][0];
+    unit2 = units[types.indexOf(dropDownInitialValue)][0];
+    value1 = 0.0;
+    finalValue = 0.0;
+    fieldText1Controller.clear();
+    fieldText2Controller.clear();
   }
 
   /// this method is called when the first units' drop down has element changed.
   /// the unit appearing in the resultant textField is supposed to change when the user change the value of this dropDown
   void onUnits1Change(value) {
-    setState(() {
-      unitInitial1 = value!;
-    });
+      unit1 = value!;
+      convertValues();
   }
 
   /// this method is called when the second units' drop down has element changed.
   /// the unit appearing in the resultant textField is supposed to change when the user change the value of this dropDown
   void onUnits2Change(value) {
-    setState(() {
-      unitInitial2 = value!;
-    });
+      unit2 = value!;
+      convertValues();
   }
 
   /// this method is called whenever the user change the elements in the first textField.
   /// it is supposed to calculate the the resultant value in the desired unit depending on the user input.
   /// it will use its value, and the values of the units drop downs to accomplish this task
-  void onTextField1Change(double number) {
-    print('You wrote this: $number');
-    setState(() {
-
-    });
+  void onTextField1Change(String number) {
+    double? parsedNumber = double.tryParse(number);
+    if(parsedNumber == null){
+      parsedNumber = 0.0;
+      invalidInput = true;
+    }else{
+      invalidInput = false;
+    }
+    value1 = parsedNumber;
+    convertValues();
   }
 
   /// this method is called whenever the switch green button is pressed.
   /// it is supposed to switch the values between the 2 textFields as well as the unites in drop down menus
   void switchButtonPressed() {
+    if(fieldText2Controller.text==double.nan.toString()){
+      value1 = 0.0;
+    }else{
+      double tempValue = value1;
+      value1 = finalValue;
+      finalValue = tempValue;
+    }
+    String tempUnit = unit1;
+    unit1 = unit2;
+    unit2 = tempUnit;
     setState(() {
+      fieldText1Controller.text = value1.toString();
+    });
+    onTextField1Change(value1.toString());
+  }
 
+  void convertValues(){
+    if (dropDownInitialValue == 'Temperature') {
+      if (unit1 == 'Celsius' && unit2 == 'Kelvin') {
+        finalValue = value1 + 273.15;
+      } else if (unit1 == 'Celsius' && unit2 == 'Fahrenheit') {
+        finalValue = (value1 * 9 / 5) + 32;
+      } else if (unit1 == 'Kelvin' && unit2 == 'Celsius') {
+        finalValue = value1 - 273.15;
+      } else if (unit1 == 'Kelvin' && unit2 == 'Fahrenheit') {
+        finalValue = (value1 - 273.15) * 9 / 5 + 32;
+      } else if (unit1 == 'Fahrenheit' && unit2 == 'Celsius') {
+        finalValue = (value1 - 32) * 5 / 9;
+      } else if (unit1 == 'Fahrenheit' && unit2 == 'Kelvin') {
+        finalValue = (value1 - 32) * 5 / 9 + 273.15;
+      } else {
+        finalValue = value1;
+      }
+    } else if (dropDownInitialValue == 'Measurement') {
+      if (unit1 == 'cm' && unit2 == 'm') {
+        finalValue = value1 / 100;
+      } else if (unit1 == 'cm' && unit2 == 'inch') {
+        finalValue = value1 / 2.54;
+      } else if (unit1 == 'cm' && unit2 == 'feet') {
+        finalValue = value1 / 30.48;
+      } else if (unit1 == 'cm' && unit2 == 'miles') {
+        finalValue = value1 / 160934;
+      } else if (unit1 == 'm' && unit2 == 'cm') {
+        finalValue = value1 * 100;
+      } else if (unit1 == 'm' && unit2 == 'inch') {
+        finalValue = value1 * 39.37;
+      } else if (unit1 == 'm' && unit2 == 'feet') {
+        finalValue = value1 * 3.281;
+      } else if (unit1 == 'm' && unit2 == 'miles'){
+        finalValue = value1 / 1609;
+      } else if (unit1 == 'inch' && unit2 == 'cm') {
+        finalValue = value1 * 2.54;
+      } else if (unit1 == 'inch' && unit2 == 'm') {
+        finalValue = value1 / 39.37;
+      } else if (unit1 == 'inch' && unit2 == 'feet') {
+        finalValue = value1 / 12;
+      } else if (unit1 == 'inch' && unit2 == 'miles') {
+        finalValue = value1 / 63360;
+      } else if (unit1 == 'feet' && unit2 == 'cm') {
+        finalValue = value1 * 30.48;
+      } else if (unit1 == 'feet' && unit2 == 'm') {
+        finalValue = value1 / 3.281;
+      } else if (unit1 == 'feet' && unit2 == 'inch') {
+        finalValue = value1 * 12;
+      } else if (unit1 == 'feet' && unit2 == 'miles') {
+        finalValue = value1 / 5280;
+      } else if (unit1 == 'miles' && unit2 == 'cm') {
+        finalValue = value1 * 160934;
+      } else if (unit1 == 'miles' && unit2 == 'm') {
+        finalValue = value1 * 1609;
+      } else if (unit1 == 'miles' && unit2 == 'inch') {
+        finalValue = value1 * 63360;
+      } else if (unit1 == 'miles' && unit2 == 'feet') {
+        finalValue = value1 * 5280;
+      } else {
+        finalValue = value1;
+      }
+    }
+    setState(() {
+      if(invalidInput){
+        fieldText2Controller.text = double.nan.toString();
+      }else {
+        fieldText2Controller.text = finalValue.toString();
+      }
     });
   }
 
@@ -77,7 +172,7 @@ class _ConvertorState extends State<Convertor> {
     // TODO: put your code here for the implementation of the Unit Convertor
 
     return Container(
-      padding: const EdgeInsets.all(30),
+      padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
         color: Color(0xFFEFFFDA),
       ),
@@ -130,9 +225,10 @@ class _ConvertorState extends State<Convertor> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: TextField(
+                      controller: fieldText1Controller,
                       keyboardType: TextInputType.number,
                       onChanged: (number) {
-                        onTextField1Change(double.parse(number));
+                        onTextField1Change(number);
                       },
                       decoration: InputDecoration(
                         filled: true,
@@ -170,7 +266,7 @@ class _ConvertorState extends State<Convertor> {
                         backgroundColor: Colors.grey[300],
                         dropdownItems:
                             units[types.indexOf(dropDownInitialValue)],
-                        value: unitInitial1,
+                        value: unit1,
                         onChangeHandler: (value) {
                           onUnits1Change(value);
                         },
@@ -223,6 +319,7 @@ class _ConvertorState extends State<Convertor> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: TextField(
+                      controller: fieldText2Controller,
                       readOnly: true,
                       decoration: InputDecoration(
                         filled: true,
@@ -260,7 +357,7 @@ class _ConvertorState extends State<Convertor> {
                         backgroundColor: Colors.grey[300],
                         dropdownItems:
                             units[types.indexOf(dropDownInitialValue)],
-                        value: unitInitial2,
+                        value: unit2,
                         onChangeHandler: (value) {
                           onUnits2Change(value);
                         },
