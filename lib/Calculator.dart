@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({super.key});
@@ -75,18 +76,18 @@ class CalculatorState extends State<Calculator> {
                     buildButton(
                         widget: buildButtonText(
                             text: "( )", textColor: Colors.lightGreen[600]),
-                        onPressedInput: () => updateInput("parenthesis")),
+                        onPressedInput: () => updateInput(")")),
                     buildButton(
                         widget: buildButtonText(
                             text: "%", textColor: Colors.lightGreen[600]),
-                        onPressedInput: () => updateInput("percentage")),
+                        onPressedInput: () => updateInput("%")),
                     buildButton(
                         widget: buildButtonText(
                             text: "\u00F7",
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("division")),
+                        onPressedInput: () => updateInput("/")),
                   ],
                 ),
                 Row(
@@ -106,7 +107,7 @@ class CalculatorState extends State<Calculator> {
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("multiplication")),
+                        onPressedInput: () => updateInput("x")),
                   ],
                 ),
                 Row(
@@ -126,7 +127,7 @@ class CalculatorState extends State<Calculator> {
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("subtraction")),
+                        onPressedInput: () => updateInput("-")),
                   ],
                 ),
                 Row(
@@ -146,7 +147,7 @@ class CalculatorState extends State<Calculator> {
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("addition")),
+                        onPressedInput: () => updateInput("+")),
                   ],
                 ),
                 Row(
@@ -159,7 +160,7 @@ class CalculatorState extends State<Calculator> {
                         onPressedInput: () => updateInput("0")),
                     buildButton(
                         widget: buildButtonText(text: "."),
-                        onPressedInput: () => updateInput("decimal")),
+                        onPressedInput: () => updateInput(".")),
                     buildButton(
                         widget: buildButtonText(
                             text: "\u003d",
@@ -213,23 +214,89 @@ class CalculatorState extends State<Calculator> {
   }
 
   void updateInput(String val) {
+    String inputType;
+    if (double.tryParse(val) != null) {
+      inputType = 'numeric';
+    } else {
+      inputType = 'operator';
+    }
+
     setState(() {
-      input += val;
-      // TODO : add logic to update input
-      // TODO : manage the input as you would like
+      if (inputType == 'numeric') {
+        if (input == '0') {
+          input = val;
+        } else {
+          input += val;
+        }
+      } else {
+        // if inputType is operator
+        if (input == '0' && val != '(-' && val != '(') {
+          _showToast(context, 'sorry, you should start with a number');
+        } else if (val == input[input.length - 1]) {
+          _showToast(context, 'invalid input');
+        } else if (isOperator(input, input.length-1, false) && isOperator(val, 0, false)) {
+          input = input.substring(0, input.length-1) + val;
+        } else if (val == 'negate') {
+          int lastIndex = input.length - 1;
+          if (input.length == 1) {
+            input = '(-$input';
+          } else if (isOperator(input, lastIndex, true)) {
+            input += '(-';
+          } else if (isOperator(input, lastIndex-1, false)) {
+            input = '${input.substring(0, lastIndex)}(-${input[lastIndex]}';
+
+          } else {
+            int index = 0;
+            bool isNumOnly = true;
+            for (int i = input.length - 1; i >= 0; i--) {
+              if (isOperator(input, i, true)) {
+                index = i;
+                isNumOnly = false;
+                break;
+              }
+            }
+            if (isNumOnly) {
+              print('This is the input isNumOnly ' + input);
+              if (input.substring(0, 2) == '(-') {
+                input = input.substring(2);
+              } else {
+                input = '(-$input';
+              }
+            } else {
+              print('This is the input contain operator ' + input);
+              if (input.substring(index + 1, index + 3) == '(-') {
+                input =
+                    '${input.substring(0, index + 1)}${input.substring(index + 3)}';
+              } else {
+                input =
+                    '${input.substring(0, index + 1)}(-${input.substring(index + 1)}';
+              }
+            }
+          }
+        }
+        // else if () {
+        //
+        // }
+        else {
+          input += val;
+        }
+      }
     });
   }
 
   void clearInput() {
     setState(() {
       input = '0';
-      // TODO: Add clear input
     });
   }
 
   void backspaceInput() {
     setState(() {
-      // TODO: Add backspace functionality
+      if (input.length > 1) {
+        input = input.substring(0, input.length - 1);
+      } else if (input.length == 1) {
+        input = '0';
+      }
     });
   }
 
@@ -237,6 +304,58 @@ class CalculatorState extends State<Calculator> {
     setState(() {
       // TODO : Add logic to get result
       // TODO : Use a library to evaluate the expression or write your own algorithm. I suggest using the first option.
+
+      String finalUserInput = input;
+      finalUserInput = finalUserInput.replaceAll('x', '*');
+
+      // checking if parenthesis are well written
+      int openCounter = 0;
+      int closeCounter = 0;
+      for (int i = 0; i < finalUserInput.length; i++) {
+        if (finalUserInput[i] == '(') {
+          openCounter++;
+        } else if (finalUserInput[i] == ')') {
+          closeCounter++;
+        }
+      }
+      if (openCounter != closeCounter) {
+        if (closeCounter < openCounter) {
+          finalUserInput+= ')';
+        }
+      }
+
+      // if (double.tryParse(finalUserInput[finalUserInput.length - 1]) != null) {
+      //   _showToast(context, 'invalid format used');
+      // } else {
+        Parser p = Parser();
+        Expression exp = p.parse(finalUserInput);
+        ContextModel cm = ContextModel();
+        double eval = exp.evaluate(EvaluationType.REAL, cm);
+        input = eval.toString();
+      //}
     });
+  }
+
+  void _showToast(BuildContext context, String message) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  bool isOperator(String text, int index, bool checkParenthesis) {
+
+    bool verify = (checkParenthesis) ? (text[index - 1] != '(') : true;
+
+    if (text[index] == 'x' ||
+        text[index] == '/' ||
+        (text[index] == '-' && verify) ||
+        text[index] == '+') {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
