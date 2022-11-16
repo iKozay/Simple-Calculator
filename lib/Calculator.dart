@@ -71,99 +71,99 @@ class CalculatorState extends State<Calculator> {
                   children: [
                     buildButton(
                         widget: buildButtonText(
-                            text: "C", textColor: Colors.red[400]),
+                            text: 'C', textColor: Colors.red[400]),
                         onPressedInput: clearInput),
                     buildButton(
                         widget: buildButtonText(
-                            text: "( )", textColor: Colors.lightGreen[600]),
-                        onPressedInput: () => updateInput("parenthesis")),
+                            text: '( )', textColor: Colors.lightGreen[600]),
+                        onPressedInput: () => updateInput('parenthesis')),
                     buildButton(
                         widget: buildButtonText(
-                            text: "%", textColor: Colors.lightGreen[600]),
-                        onPressedInput: () => updateInput("%")),
+                            text: '%', textColor: Colors.lightGreen[600]),
+                        onPressedInput: () => updateInput('%')),
                     buildButton(
                         widget: buildButtonText(
-                            text: "\u00F7",
+                            text: '\u00F7',
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("/")),
+                        onPressedInput: () => updateInput('/')),
                   ],
                 ),
                 Row(
                   children: [
                     buildButton(
-                        widget: buildButtonText(text: "7"),
-                        onPressedInput: () => updateInput("7")),
+                        widget: buildButtonText(text: '7'),
+                        onPressedInput: () => updateInput('7')),
                     buildButton(
-                        widget: buildButtonText(text: "8"),
-                        onPressedInput: () => updateInput("8")),
+                        widget: buildButtonText(text: '8'),
+                        onPressedInput: () => updateInput('8')),
                     buildButton(
-                        widget: buildButtonText(text: "9"),
-                        onPressedInput: () => updateInput("9")),
+                        widget: buildButtonText(text: '9'),
+                        onPressedInput: () => updateInput('9')),
                     buildButton(
                         widget: buildButtonText(
-                            text: "\u00D7",
+                            text: '\u00D7',
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("x")),
+                        onPressedInput: () => updateInput('x')),
                   ],
                 ),
                 Row(
                   children: [
                     buildButton(
-                        widget: buildButtonText(text: "4"),
-                        onPressedInput: () => updateInput("4")),
+                        widget: buildButtonText(text: '4'),
+                        onPressedInput: () => updateInput('4')),
                     buildButton(
-                        widget: buildButtonText(text: "5"),
-                        onPressedInput: () => updateInput("5")),
+                        widget: buildButtonText(text: '5'),
+                        onPressedInput: () => updateInput('5')),
                     buildButton(
-                        widget: buildButtonText(text: "6"),
-                        onPressedInput: () => updateInput("6")),
+                        widget: buildButtonText(text: '6'),
+                        onPressedInput: () => updateInput('6')),
                     buildButton(
                         widget: buildButtonText(
-                            text: "\u2212",
+                            text: '\u2212',
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("-")),
+                        onPressedInput: () => updateInput('-')),
                   ],
                 ),
                 Row(
                   children: [
                     buildButton(
-                        widget: buildButtonText(text: "1"),
-                        onPressedInput: () => updateInput("1")),
+                        widget: buildButtonText(text: '1'),
+                        onPressedInput: () => updateInput('1')),
                     buildButton(
-                        widget: buildButtonText(text: "2"),
-                        onPressedInput: () => updateInput("2")),
+                        widget: buildButtonText(text: '2'),
+                        onPressedInput: () => updateInput('2')),
                     buildButton(
-                        widget: buildButtonText(text: "3"),
-                        onPressedInput: () => updateInput("3")),
+                        widget: buildButtonText(text: '3'),
+                        onPressedInput: () => updateInput('3')),
                     buildButton(
                         widget: buildButtonText(
-                            text: "\u002b",
+                            text: '\u002b',
                             textColor: Colors.lightGreen[600],
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
-                        onPressedInput: () => updateInput("+")),
+                        onPressedInput: () => updateInput('+')),
                   ],
                 ),
                 Row(
                   children: [
                     buildButton(
-                        widget: buildButtonText(text: "+/-"),
-                        onPressedInput: () => updateInput("negate")),
+                        widget: buildButtonText(text: '+/-'),
+                        onPressedInput: () => updateInput('negate')),
                     buildButton(
-                        widget: buildButtonText(text: "0"),
-                        onPressedInput: () => updateInput("0")),
+                        widget: buildButtonText(text: '0'),
+                        onPressedInput: () => updateInput('0')),
                     buildButton(
-                        widget: buildButtonText(text: "."),
-                        onPressedInput: () => updateInput(".")),
+                        widget: buildButtonText(text: '.'),
+                        onPressedInput: () => updateInput('.')),
                     buildButton(
                         widget: buildButtonText(
-                            text: "\u003d",
+                            text: '\u003d',
                             textColor: Colors.white,
                             fontSize: 50,
                             fontWeight: FontWeight.w300),
@@ -416,7 +416,8 @@ class CalculatorState extends State<Calculator> {
     if (text[index] == 'x' ||
         text[index] == '/' ||
         text[index] == '-' ||
-        text[index] == '+') {
+        text[index] == '+' ||
+        text[index] == '*') {
       return true;
     } else {
       return false;
@@ -448,11 +449,14 @@ class CalculatorState extends State<Calculator> {
         print(percentageIndexes.length);
         for (int i = 0; i < percentageIndexes.length; i++) {
           String value = '';
-          print('the loop is executed');
+          print('outer loop executed');
           for (int m = percentageIndexes[i]; (m >= 0); m--) {
-            if (!isOperator(finalUserInput, m)) {
+            if (isOperator(finalUserInput, m)) {
+              print('exit loop');
+              break;
+            } else {
               value = finalUserInput[m] + value;
-              print('the loop is executed');
+              print('inner loop executed');
             }
           }
           print('this is the value $value');
