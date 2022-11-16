@@ -76,7 +76,7 @@ class CalculatorState extends State<Calculator> {
                     buildButton(
                         widget: buildButtonText(
                             text: "( )", textColor: Colors.lightGreen[600]),
-                        onPressedInput: () => updateInput(")")),
+                        onPressedInput: () => updateInput("parenthesis")),
                     buildButton(
                         widget: buildButtonText(
                             text: "%", textColor: Colors.lightGreen[600]),
@@ -225,59 +225,28 @@ class CalculatorState extends State<Calculator> {
       if (inputType == 'numeric') {
         if (input == '0') {
           input = val;
+        } else if (input[input.length - 1] == '%') {
+          // do nothing
         } else {
           input += val;
         }
       } else {
         // if inputType is operator
-        if (input == '0' && val != '(-' && val != '(') {
+        if (val == 'parenthesis') {
+          input = parenthesisLogic(input);
+        } else if (input == '0' && val != 'negate' && val != '.') {
           _showToast(context, 'sorry, you should start with a number');
         } else if (val == input[input.length - 1]) {
-          _showToast(context, 'invalid input');
-        } else if (isOperator(input, input.length-1, false) && isOperator(val, 0, false)) {
-          input = input.substring(0, input.length-1) + val;
+          // we don't need to show anything in this case
+        } else if (isOperator(input, input.length - 1) && isOperator(val, 0)) {
+          input = input.substring(0, input.length - 1) + val;
         } else if (val == 'negate') {
-          int lastIndex = input.length - 1;
-          if (input.length == 1) {
-            input = '(-$input';
-          } else if (isOperator(input, lastIndex, true)) {
-            input += '(-';
-          } else if (isOperator(input, lastIndex-1, false)) {
-            input = '${input.substring(0, lastIndex)}(-${input[lastIndex]}';
-
-          } else {
-            int index = 0;
-            bool isNumOnly = true;
-            for (int i = input.length - 1; i >= 0; i--) {
-              if (isOperator(input, i, true)) {
-                index = i;
-                isNumOnly = false;
-                break;
-              }
-            }
-            if (isNumOnly) {
-              print('This is the input isNumOnly ' + input);
-              if (input.substring(0, 2) == '(-') {
-                input = input.substring(2);
-              } else {
-                input = '(-$input';
-              }
-            } else {
-              print('This is the input contain operator ' + input);
-              if (input.substring(index + 1, index + 3) == '(-') {
-                input =
-                    '${input.substring(0, index + 1)}${input.substring(index + 3)}';
-              } else {
-                input =
-                    '${input.substring(0, index + 1)}(-${input.substring(index + 1)}';
-              }
-            }
-          }
-        }
-        // else if () {
-        //
-        // }
-        else {
+          input = negateLogic(input);
+        } else if (val == '.') {
+          input = decimalLogic(input);
+        } else if (val == '%') {
+          input = percentageLogic(input);
+        } else {
           input += val;
         }
       }
@@ -302,9 +271,6 @@ class CalculatorState extends State<Calculator> {
 
   void getResult() {
     setState(() {
-      // TODO : Add logic to get result
-      // TODO : Use a library to evaluate the expression or write your own algorithm. I suggest using the first option.
-
       String finalUserInput = input;
       finalUserInput = finalUserInput.replaceAll('x', '*');
 
@@ -319,20 +285,15 @@ class CalculatorState extends State<Calculator> {
         }
       }
       if (openCounter != closeCounter) {
-        if (closeCounter < openCounter) {
-          finalUserInput+= ')';
+        if (openCounter - closeCounter == 1) {
+          finalUserInput += ')';
+          calculate(finalUserInput);
+        } else {
+          _showToast(context, 'invalid input');
         }
+      } else {
+        calculate(finalUserInput);
       }
-
-      // if (double.tryParse(finalUserInput[finalUserInput.length - 1]) != null) {
-      //   _showToast(context, 'invalid format used');
-      // } else {
-        Parser p = Parser();
-        Expression exp = p.parse(finalUserInput);
-        ContextModel cm = ContextModel();
-        double eval = exp.evaluate(EvaluationType.REAL, cm);
-        input = eval.toString();
-      //}
     });
   }
 
@@ -345,17 +306,174 @@ class CalculatorState extends State<Calculator> {
     );
   }
 
-  bool isOperator(String text, int index, bool checkParenthesis) {
+  String parenthesisLogic(String input) {
+    if (input == '0') {
+      input = '(';
+    } else if (double.tryParse(input[input.length - 1]) != null ||
+        input[input.length - 1] == ')' ||
+        input[input.length - 1] == '%') {
+      input += ')';
+    } else if (isOperator(input, input.length - 1) ||
+        input[input.length - 1] == '(') {
+      input += '(';
+    }
+    return input;
+  }
 
-    bool verify = (checkParenthesis) ? (text[index - 1] != '(') : true;
+  String negateLogic(String input) {
+    int lastIndex = input.length - 1;
+    if (input == '0') {
+      input = '(-';
+    } else if (input.length == 1) {
+      input = '(-$input';
+    } else if (isOperator(input, lastIndex)) {
+      input += '(-';
+    } else if (isOperator(input, lastIndex - 1)) {
+      input = '${input.substring(0, lastIndex)}(-${input[lastIndex]}';
+    } else {
+      int index = 0;
+      bool isNumOnly = true;
+      for (int i = input.length - 1; i >= 0; i--) {
+        if (isOperator(input, i)) {
+          index = i;
+          isNumOnly = false;
+          break;
+        }
+      }
+      if (isNumOnly) {
+        if (input.substring(0, 2) == '(-') {
+          input = input.substring(2);
+        } else {
+          input = '(-$input';
+        }
+      } else {
+        if (input.substring(index + 1, index + 3) == '(-') {
+          input =
+              '${input.substring(0, index + 1)}${input.substring(index + 3)}';
+        } else {
+          input =
+              '${input.substring(0, index + 1)}(-${input.substring(index + 1)}';
+        }
+      }
+    }
+    return input;
+  }
 
+  String decimalLogic(String input) {
+    if (input[input.length - 1] == '%') {
+      // do nothing
+    } else {
+      int lastDotIndex = 0;
+      bool dotExist = false;
+      for (int i = input.length - 1; i >= 0; i--) {
+        if (input[i] == '.') {
+          dotExist = true;
+          lastDotIndex = i;
+          break;
+        }
+      }
+      if (!dotExist) {
+        input += '.';
+      } else {
+        int lastOperatorIndex = 0;
+        bool operatorExist = false;
+        for (int i = input.length - 1; i >= 0; i--) {
+          if (isOperator(input, i)) {
+            operatorExist = true;
+            lastOperatorIndex = i;
+            break;
+          }
+        }
+        if (!operatorExist) {
+          // do nothing
+        } else {
+          // if operator exist and dot exist, then compare their lastIndexes.
+          if (lastDotIndex > lastOperatorIndex) {
+            // do nothing
+          } else {
+            if (lastOperatorIndex == input.length - 1) {
+              input += '0.';
+            } else {
+              input += '.';
+            }
+          }
+        }
+      }
+    }
+    return input;
+  }
+
+  String percentageLogic(String input) {
+    // check if character before it is operator
+    if (double.tryParse(input[input.length - 1]) != null ||
+        input[input.length - 1] == '.') {
+      input += '%';
+    }
+    return input;
+  }
+
+  bool isOperator(String text, int index) {
     if (text[index] == 'x' ||
         text[index] == '/' ||
-        (text[index] == '-' && verify) ||
+        text[index] == '-' ||
         text[index] == '+') {
       return true;
     } else {
       return false;
+    }
+  }
+  void calculate(String finalUserInput) {
+    print('calculate Method test');
+    if (finalUserInput.contains('%')) {
+      print('there is percentage');
+      print(finalUserInput.length);
+      int percentageCounter = 0;
+      List<int> percentageIndexes = [];
+
+      for (int i = 0; i < finalUserInput.length; i++) {
+        if (finalUserInput[i] == '%') {
+          percentageCounter++;
+          percentageIndexes.add(i);
+        }
+      }
+      print('This is percentage Counter: $percentageCounter');
+
+      print('This is percentage List: $percentageIndexes');
+
+
+      if (percentageCounter == 0) {
+        print('No percentage');
+        // do nothing
+      } else {
+        print(percentageIndexes.length);
+        for (int i = 0; i < percentageIndexes.length; i++) {
+          String value = '';
+          print('the loop is executed');
+          for (int m = percentageIndexes[i]; (m >= 0); m--) {
+            if (!isOperator(finalUserInput, m)) {
+              value = finalUserInput[m] + value;
+              print('the loop is executed');
+            }
+          }
+          print('this is the value $value');
+          String valueConverted = (double.parse(value.substring(0, value.length-1))/100).toString();
+          print('this is the ConvertedValue $valueConverted');
+          finalUserInput = finalUserInput.replaceFirst(value, valueConverted);
+          print('this is the finalUserInput $finalUserInput');
+        }
+      }
+    }
+
+
+    print (finalUserInput);
+    Parser p = Parser();
+    Expression exp = p.parse(finalUserInput);
+    ContextModel cm = ContextModel();
+    double eval = exp.evaluate(EvaluationType.REAL, cm);
+    if (eval.toString().contains('.') && eval.toString().length > 10) {
+      input = num.parse(eval.toStringAsFixed(10)).toString();
+    } else {
+      input = eval.toString();
     }
   }
 }
